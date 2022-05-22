@@ -1,14 +1,16 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:mytutor/views/mainscreen.dart';
+import 'package:mytutor/constants.dart';
 import 'package:mytutor/views/registerscreen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/user.dart';
-import '../constants.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -19,8 +21,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   late double screenHeight, screenWidth, ctrwidth;
   bool remember = false;
-  TextEditingController emailCtrller = TextEditingController();
-  TextEditingController passwordCtrller = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -60,11 +62,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                         child: TextFormField(
-                          controller: emailCtrller,
+                          controller: emailController,
                           decoration: InputDecoration(
                               hintText: "Email",
+                              prefixIcon: const Icon(Icons.email_rounded),
                               border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(5.0))),
+                                  borderRadius: BorderRadius.circular(20.0))),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter valid email';
@@ -84,11 +87,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                         child: TextFormField(
-                          controller: passwordCtrller,
+                          controller: passwordController,
                           decoration: InputDecoration(
                               hintText: "Password",
+                              prefixIcon: const Icon(Icons.password_sharp),
                               border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(5.0))),
+                                  borderRadius: BorderRadius.circular(20.0))),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your password';
@@ -114,6 +118,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 50,
                         child: ElevatedButton(
                           child: const Text("Login"),
+                          style: ButtonStyle(
+                              padding: MaterialStateProperty.all<EdgeInsets>(
+                                  const EdgeInsets.all(15)),
+                              shape: MaterialStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ))),
                           onPressed: _loginUser,
                         ),
                       ),
@@ -121,8 +133,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                         width: screenWidth,
                         height: 50,
-                        child:  ElevatedButton(
+                        child: ElevatedButton(
                           child: const Text("Register"),
+                          style: ButtonStyle(
+                              padding: MaterialStateProperty.all<EdgeInsets>(
+                                  const EdgeInsets.all(15)),
+                                  backgroundColor: MaterialStateProperty.all<Color>(Colors.orange),
+                              shape: MaterialStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ))),
                           onPressed: () {
                             _navigateToNextScreen(context);
                           },
@@ -146,19 +167,25 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _loginUser() {
-    String _email = emailCtrller.text;
-    String _password = passwordCtrller.text;
+    String _email = emailController.text;
+    String _password = passwordController.text;
     print(_email);
-    if (_email.isNotEmpty && _password.isNotEmpty) {
+    print(_password);
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
       http.post(
-          Uri.parse(CONSTANTS.server + "/myshop/mobile/php/login_user.php"),
-          body: {"email": _email, "password": _password}).then((response) {
+          Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/login_user.php"),
+          body: {
+            "email": _email,
+            "password": _password,
+            }).then((response) {
         print(response.body);
         var data = jsonDecode(response.body);
-        if (data['status'] == 'success') {
+        print (data);
+         if (response.statusCode == 200 && data['status'] == 'success') {
           User user = User.fromJson(data['data']);
           Fluttertoast.showToast(
-              msg: "Success",
+              msg: "Welcome",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
@@ -167,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
               MaterialPageRoute(builder: (content) => MainScreen(user: user)));
         } else {
           Fluttertoast.showToast(
-              msg: "Failed",
+              msg: "Error",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
