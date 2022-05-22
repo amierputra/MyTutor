@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:mytutor/views/mainscreen.dart';
+import 'package:mytutor/views/registerscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/user.dart';
+import '../constants.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -112,6 +116,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: const Text("Login"),
                           onPressed: _loginUser,
                         ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: screenWidth,
+                        height: 50,
+                        child:  ElevatedButton(
+                          child: const Text("Register"),
+                          onPressed: () {
+                            _navigateToNextScreen(context);
+                          },
+                        ),
                       )
                     ],
                   ),
@@ -136,11 +151,12 @@ class _LoginScreenState extends State<LoginScreen> {
     print(_email);
     if (_email.isNotEmpty && _password.isNotEmpty) {
       http.post(
-          Uri.parse("http://10.19.51.166/myshop/mobile/php/login_user.php"),
+          Uri.parse(CONSTANTS.server + "/myshop/mobile/php/login_user.php"),
           body: {"email": _email, "password": _password}).then((response) {
         print(response.body);
         var data = jsonDecode(response.body);
         if (data['status'] == 'success') {
+          User user = User.fromJson(data['data']);
           Fluttertoast.showToast(
               msg: "Success",
               toastLength: Toast.LENGTH_SHORT,
@@ -148,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
               timeInSecForIosWeb: 1,
               fontSize: 16.0);
           Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (content) => const MainScreen()));
+              MaterialPageRoute(builder: (content) => MainScreen(user: user)));
         } else {
           Fluttertoast.showToast(
               msg: "Failed",
@@ -159,5 +175,10 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       });
     }
+  }
+
+  void _navigateToNextScreen(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => const RegisterScreen()));
   }
 }
