@@ -29,18 +29,6 @@ try {
     sendJsonResponse($response);
 }
 
-/*if ($conn->query($sqlinsert) === TRUE) {
-    $response = array('status' => 'success', 'data' => null);
-    /*$filename = mysqli_insert_id($conn);
-    
-    
-    
-    sendJsonResponse($response);
-} else {
-    $response = array('status' => 'failed', 'data' => null);
-    sendJsonResponse($response);
-}*/
-
 function sendJsonResponse($sentArray)
 {
     header('Content-Type: application/json');
