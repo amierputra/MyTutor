@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/user.dart';
+//import '../constants.dart';
 
 class MainScreen extends StatefulWidget {
   final User user;
@@ -11,6 +12,8 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  List<User> userList = <User>[];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,8 +24,8 @@ class _MainScreenState extends State<MainScreen> {
         child: ListView(
           children: [
             UserAccountsDrawerHeader(
-              accountName:  Text(widget.user.name.toString()),
-              accountEmail:  Text(widget.user.email.toString()),
+              accountName: Text(widget.user.name.toString()),
+              accountEmail: Text(widget.user.email.toString()),
               currentAccountPicture: CircleAvatar(
                 child: ClipOval(
                   child: Image.asset('assets/images/amier2.png'),
