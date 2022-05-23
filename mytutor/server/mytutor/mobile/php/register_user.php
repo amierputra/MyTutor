@@ -29,6 +29,7 @@ try {
     sendJsonResponse($response);
 }
 
+
 function sendJsonResponse($sentArray)
 {
     header('Content-Type: application/json');

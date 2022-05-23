@@ -20,8 +20,8 @@ if ($number_of_rows  > 0) {
         $useremail = $us['user_email'];
         $username = $us['user_name'];
         $phone = $us['user_phone'];
-        $address = $us['user_address'];
-        $regdate = $us['user_datereg'];
+        $address = $us['user_addr'];
+        $datereg = $us['user_datereg'];
     }
 
     $user['id'] = $id;
@@ -29,7 +29,7 @@ if ($number_of_rows  > 0) {
     $user['name'] = $username;
     $user['phone'] = $phone;
     $user['address'] = $address;
-    $user['regdate'] = $regdate;
+    $user['datereg'] = $datereg;
 
     $response = array('status' => 'success', 'data' => $user);
     sendJsonResponse($response);

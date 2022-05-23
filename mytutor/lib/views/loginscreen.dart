@@ -169,8 +169,6 @@ class _LoginScreenState extends State<LoginScreen> {
   void _loginUser() {
     String _email = emailController.text;
     String _password = passwordController.text;
-    print(_email);
-    print(_password);
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       http.post(
@@ -179,10 +177,8 @@ class _LoginScreenState extends State<LoginScreen> {
             "email": _email,
             "password": _password,
             }).then((response) {
-        print(response.body);
         var data = jsonDecode(response.body);
-        print (data);
-         if (response.statusCode == 200 && data['status'] == 'success') {
+         if (data['status'] == 'success') {
           User user = User.fromJson(data['data']);
           Fluttertoast.showToast(
               msg: "Welcome",
