@@ -1,7 +1,12 @@
+// ignore_for_file: unused_import
+
 import 'package:flutter/material.dart';
 
 import '../models/user.dart';
-//import '../constants.dart';
+import '../constants.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mytutor/constants.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class MainScreen extends StatefulWidget {
   final User user;
@@ -13,9 +18,19 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   List<User> userList = <User>[];
+  late double screenHeight, screenWidth, resWidth;
 
   @override
   Widget build(BuildContext context) {
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth <= 600) {
+      resWidth = screenWidth;
+      //rowcount = 2;
+    } else {
+      resWidth = screenWidth * 0.75;
+      //rowcount = 3;
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('MyTutor'),
@@ -28,7 +43,18 @@ class _MainScreenState extends State<MainScreen> {
               accountEmail: Text(widget.user.email.toString()),
               currentAccountPicture: CircleAvatar(
                 child: ClipOval(
-                  child: Image.asset('assets/images/amier2.png'),
+                  child: CachedNetworkImage(
+                    imageUrl: CONSTANTS.server +
+                        "/mytutor/mobile/assets/profiles/" +
+                        widget.user.id.toString() +
+                        '.jpg',
+                        fit: BoxFit.cover,
+                                  width: resWidth,
+                                  placeholder: (context, url) =>
+                                      const LinearProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+                  ),
                 ),
               ),
             ),
