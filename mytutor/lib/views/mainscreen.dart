@@ -1,9 +1,17 @@
-// ignore_for_file: unused_import
+// ignore_for_file: unused_import, avoid_print, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:mytutor/views/subjectscreen.dart';
+import 'package:mytutor/views/favouritescreen.dart';
+import 'package:mytutor/views/subscribescreen.dart';
+import 'package:mytutor/views/profilescreen.dart';
+import 'package:mytutor/views/tutorscreen.dart';
 
+import 'dart:convert';
 import '../models/user.dart';
+import '../models/subjects.dart';
 import '../constants.dart';
+import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mytutor/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -17,91 +25,103 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  List<User> userList = <User>[];
-  late double screenHeight, screenWidth, resWidth;
+  late int _selectedIndex;
+  late List<Widget> _pages;
+  late Widget _page1, _page2, _page3, _page4, _page5;
+  late Widget _currentPage;
+  String text = '';
+  String text1 = "Subjects";
+  String text2 = "Tutors";
+  String text3 = "Subscribe";
+  String text4 = "Favourite";
+  String text5 = "Profile";
+
+  @override
+  void initState() {
+    super.initState();
+
+    _page1 = SubjectScreen();
+    _page2 = TutorScreen();
+    _page3 = SubscribeScreen();
+    _page4 = FavouriteScreen();
+    _page5 = ProfileScreen(
+      user: widget.user,
+    );
+    _pages = [_page1, _page2, _page3, _page4, _page5];
+    _selectedIndex = 0;
+    _currentPage = _page1;
+    text = text1;
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      _currentPage = _pages[index];
+
+      switch (index) {
+        case 0:
+          text = text1;
+          break;
+
+        case 1:
+          text = text2;
+          break;
+
+        case 2:
+          text = text3;
+          break;
+
+        case 3:
+          text = text4;
+          break;
+
+        case 4:
+          text = text5;
+          break;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    screenHeight = MediaQuery.of(context).size.height;
-    screenWidth = MediaQuery.of(context).size.width;
-    if (screenWidth <= 600) {
-      resWidth = screenWidth;
-      //rowcount = 2;
-    } else {
-      resWidth = screenWidth * 0.75;
-      //rowcount = 3;
-    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('MyTutor'),
       ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            UserAccountsDrawerHeader(
-              accountName: Text(widget.user.name.toString()),
-              accountEmail: Text(widget.user.email.toString()),
-              currentAccountPicture: CircleAvatar(
-                child: ClipOval(
-                  child: CachedNetworkImage(
-                    imageUrl: CONSTANTS.server +
-                        "/mytutor/mobile/assets/profiles/" +
-                        widget.user.id.toString() +
-                        '.jpg',
-                        fit: BoxFit.cover,
-                                  width: resWidth,
-                                  placeholder: (context, url) =>
-                                      const LinearProgressIndicator(),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                  ),
+      body: _currentPage,
+      bottomNavigationBar: BottomNavigationBar(
+         type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.library_books,
                 ),
-              ),
-            ),
-            _createDrawerItem(
-              icon: Icons.list_alt_outlined,
-              text: 'My Products',
-              onTap: () {},
-            ),
-            _createDrawerItem(
-              icon: Icons.local_shipping,
-              text: 'My Orders',
-              onTap: () {},
-            ),
-            _createDrawerItem(
-              icon: Icons.verified_user,
-              text: 'My Profile',
-              onTap: () {},
-            ),
+                label: "Subjects"),
+            BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.co_present,
+                ),
+                label: "Tutors"),
+            BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.assignment_turned_in,
+                ),
+                label: "Subscribe"),
+            BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.favorite,
+                ),
+                label: "Favourites"),
+            BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.account_circle,
+                ),
+                label: "Profile"),
           ],
-        ),
-      ),
-      body: const Center(
-        child: Text('This is main page.'),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        tooltip: "New Product",
-        onPressed: () {},
-      ),
-    );
-  }
-
-  Widget _createDrawerItem(
-      {required IconData icon,
-      required String text,
-      required GestureTapCallback onTap}) {
-    return ListTile(
-      title: Row(
-        children: <Widget>[
-          Icon(icon),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Text(text),
-          )
-        ],
-      ),
-      onTap: onTap,
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            _onItemTapped(index);
+          }),
     );
   }
 }
