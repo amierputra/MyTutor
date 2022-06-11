@@ -23,10 +23,9 @@ class SubjectScreen extends StatefulWidget {
 
 class _SubjectScreenState extends State<SubjectScreen> {
   List<Subjects> subjectlist = <Subjects>[];
-  String titlecenter = "";
+  var titlecenter = "";
   int _currentIndex = 0;
   String maintitle = "Subjects";
-  List<User> userList = <User>[];
   late double screenHeight, screenWidth, resWidth;
 
   @override
@@ -57,7 +56,7 @@ class _SubjectScreenState extends State<SubjectScreen> {
                 children: [
                   const Padding(
                     padding: EdgeInsets.all(8.0),
-                    child: Text("Your Current Products",
+                    child: Text("Tutor",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                   ),
@@ -76,7 +75,7 @@ class _SubjectScreenState extends State<SubjectScreen> {
                                   fit: BoxFit.cover,
                                   imageUrl: CONSTANTS.server +
                                       "/mytutor/mobile/assets/courses/" +
-                                      subjectlist[index].subject_id.toString() +
+                                      subjectlist[index].tutor_id.toString() +
                                       ".png",
                                   placeholder: (context, url) =>
                                       const LinearProgressIndicator(),
@@ -96,8 +95,8 @@ class _SubjectScreenState extends State<SubjectScreen> {
                                             style: TextStyle(
                                                 fontSize: resWidth * 0.045,
                                                 fontWeight: FontWeight.bold)),
-                                        Text("Rating:"+
-                                          subjectlist[index].subject_rating
+                                        Text("Price:"+
+                                          subjectlist[index].subject_price
                                               .toString(),
                                         ),
                                       ],
@@ -111,9 +110,8 @@ class _SubjectScreenState extends State<SubjectScreen> {
                   ),
                 ],
               ),
-        
-    );
-}
+        );
+  }
 
 void onTabTapped(int index) {
     setState(() {
@@ -137,15 +135,13 @@ void onTabTapped(int index) {
   }
 
 void _loadSubject() {
-    http
-        .post(
+    http.post(
       Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/loadsubjects.php"),
-    ).then((response) {
+    ).then((response)  {
       print(response.body);
       var jsondata = jsonDecode(response.body);
       if (response.statusCode == 200 && jsondata['status'] == 'success') {
-        var extractdata = jsondata['data'];
-        print (extractdata);
+        var extractdata =  jsondata['data'];
         if (extractdata['subjects'] != null) {
           subjectlist = <Subjects>[];
           extractdata['subjects'].forEach((v) {
