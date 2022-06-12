@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import, avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:mytutor/views/profilescreen.dart';
 import 'package:mytutor/views/tutorscreen.dart';
@@ -71,9 +73,9 @@ String maintitle = "Tutor";
                                   width: screenWidth,
                                   fit: BoxFit.cover,
                                   imageUrl: CONSTANTS.server +
-                                      "/mytutor/mobile/assets/courses/" +
+                                      "/mytutor/mobile/assets/tutors/" +
                                       tutorList[index].tutor_id.toString() +
-                                      ".png",
+                                      ".jpg",
                                   placeholder: (context, url) =>
                                       const LinearProgressIndicator(),
                                   errorWidget: (context, url, error) =>

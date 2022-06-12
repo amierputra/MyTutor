@@ -14,7 +14,7 @@ $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
 $rows = $stmt->fetchAll();
 
 if ($number_of_rows  > 0) {
-    $subjects["subjects"] = array(); 
+    $subjects["subjects"] = array();
     foreach ($rows as $row) {
         $sublist = array();
         $sublist['subject_id'] = $row['subject_id'];

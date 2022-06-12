@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 class Subjects {
   String? subject_id;
   String? subject_name;
@@ -7,14 +9,15 @@ class Subjects {
   String? subject_sessions;
   String? subject_rating;
 
-  Subjects(
-      {this.subject_id,
+  Subjects({
+      this.subject_id,
       this.subject_name,
       this.subject_description,
       this.subject_price,
       this.tutor_id,
       this.subject_sessions,
-      this.subject_rating});
+      this.subject_rating,
+  });
 
   Subjects.fromJson(Map<String, dynamic> json) {
     subject_id = json["subject_id"];
