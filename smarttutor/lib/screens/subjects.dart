@@ -1,0 +1,192 @@
+// ignore_for_file: unused_import
+
+import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:async';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
+import 'package:smarttutor/main.dart';
+import 'package:smarttutor/screens/mainscreen.dart';
+import 'package:smarttutor/constants.dart';
+import 'package:smarttutor/models/subject.dart';
+import 'package:smarttutor/models/user.dart';
+
+class SubjectPage extends StatefulWidget {
+  const SubjectPage({Key? key}) : super(key: key);
+
+  @override
+  State<SubjectPage> createState() => _SubjectPageState();
+}
+
+class _SubjectPageState extends State<SubjectPage> {
+  List<Subject> subjectList = <Subject>[];
+  String titlecenter = "Loading...";
+  int _currentIndex = 0;
+  String maintitle = "Subjects";
+  late double screenHeight, screenWidth, resWidth;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSubjects();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth <= 600) {
+      resWidth = screenWidth;
+      //rowcount = 2;
+    } else {
+      resWidth = screenWidth * 0.75;
+      //rowcount = 3;
+    }
+    return Scaffold(
+      body: subjectList.isEmpty
+          ? Padding(
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Column(
+                children: [
+                  Center(
+                    child: Text(titlecenter,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                  )
+                ],
+              ),
+            )
+          : Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                  child: Text("Subject",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      childAspectRatio: (1 / 1),
+                      children: List.generate(subjectList.length, (index) {
+                        return Card(
+                            child: Column(
+                          children: [
+                            Flexible(
+                              flex: 6,
+                              child: CachedNetworkImage(
+                                imageUrl: CONSTANTS.server +
+                                    "/mytutor/mobile/assets/courses/" +
+                                    subjectList[index].subject_id.toString() +
+                                    '.png',
+                                fit: BoxFit.cover,
+                                width: screenWidth,
+                                placeholder: (context, url) =>
+                                    const LinearProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.error),
+                              ),
+                            ),
+                            Flexible(
+                                flex: 6,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        subjectList[index]
+                                            .subject_name
+                                            .toString(),
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: resWidth * 0.045,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text("RM " +
+                                          double.parse(subjectList[index]
+                                                  .subject_price
+                                                  .toString())
+                                              .toStringAsFixed(2)),
+                                      Text("Rating: " +
+                                          subjectList[index]
+                                              .subject_rating
+                                              .toString()),
+                                    ],
+                                  ),
+                                ))
+                          ],
+                        ));
+                      }),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+      if (_currentIndex == 0) {
+        maintitle = "Subjects";
+      }
+      if (_currentIndex == 1) {
+        maintitle = "Tutors";
+      }
+      if (_currentIndex == 2) {
+        maintitle = "Subscribe";
+      }
+      if (_currentIndex == 3) {
+        maintitle = "Favourites";
+      }
+      if (_currentIndex == 4) {
+        maintitle = "Profile";
+      }
+    });
+  }
+
+  void _loadSubjects() {
+    http
+        .post(
+      Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/loadsubject.php"),
+    )
+        .then((response) {
+      print(response.body);
+      if (response.body.isNotEmpty) {
+        var jsondata = jsonDecode(response.body);
+
+        if (response.statusCode == 200 && jsondata['status'] == 'success') {
+          var extractdata = jsondata['data'];
+          if (extractdata['subjects'] != null) {
+            subjectList = <Subject>[];
+            extractdata['subjects'].forEach((v) {
+              subjectList.add(Subject.fromJson(v));
+            });
+            titlecenter = subjectList.length.toString() + " Subjects Available";
+          } else {
+            titlecenter = "No Subject Available";
+            subjectList.clear();
+          }
+          setState(() {});
+        } else {
+          //do something
+          titlecenter = "No Subject Available";
+          subjectList.clear();
+          setState(() {});
+        }
+      } else {
+        titlecenter = "Nothing";
+        print(titlecenter);
+      }
+    });
+  }
+}
