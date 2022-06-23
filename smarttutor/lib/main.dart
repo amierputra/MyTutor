@@ -72,7 +72,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
               children: const [
                 CircularProgressIndicator(),
                 SizedBox(height: 30),
-                Text("Version 0.1",
+                Text("Version 1.1",
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
