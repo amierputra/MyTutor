@@ -28,10 +28,12 @@ class _SubjectPageState extends State<SubjectPage> {
   String maintitle = "Subjects";
   late double screenHeight, screenWidth, resWidth;
 
+  TextEditingController searchController = TextEditingController();
+  String search = "";
   @override
   void initState() {
     super.initState();
-    _loadSubjects();
+    _loadSubjects(search);
   }
 
   @override
@@ -55,14 +57,35 @@ class _SubjectPageState extends State<SubjectPage> {
                     child: Text(titlecenter,
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
-                  )
+                  ),
                 ],
               ),
             )
           : Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                  child: Container(
+                    color: Colors.limeAccent,
+                    width: 100,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Text("Search",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: () {
+                            _loadSearchDialog();
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+                ),
                 const Padding(
-                  padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                  padding: EdgeInsets.fromLTRB(0, 18, 0, 10),
                   child: Text("Subject",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -154,12 +177,12 @@ class _SubjectPageState extends State<SubjectPage> {
     });
   }
 
-  void _loadSubjects() {
-    http
-        .post(
-      Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/loadsubject.php"),
-    )
-        .then((response) {
+  void _loadSubjects(String _search) {
+    http.post(
+        Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/loadsubject.php"),
+        body: {
+          'search': _search,
+        }).then((response) {
       print(response.body);
       if (response.body.isNotEmpty) {
         var jsondata = jsonDecode(response.body);
@@ -188,5 +211,52 @@ class _SubjectPageState extends State<SubjectPage> {
         print(titlecenter);
       }
     });
+  }
+
+  void _loadSearchDialog() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5.0))),
+            title: const Text(
+              "Search",
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter the name of subject',
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: searchController.clear,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      search = searchController.text;
+                      Navigator.of(context).pop();
+                      _loadSubjects(search);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                    ),
+                    child: const Text("Search"),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
   }
 }

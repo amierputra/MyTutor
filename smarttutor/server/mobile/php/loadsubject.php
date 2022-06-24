@@ -7,7 +7,9 @@ if (!isset($_POST)) {
 
 include_once("config.php");
 
-$stmt = $conn->prepare("SELECT * FROM tbl_subjects ORDER BY subject_id DESC");
+$search = $_POST['search'];
+
+$stmt = $conn->prepare("SELECT * FROM tbl_subjects WHERE subject_name LIKE '%$search%'");
 $stmt->execute();
 $number_of_rows = $stmt->rowCount();
 $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);

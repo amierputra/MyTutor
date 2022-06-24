@@ -179,7 +179,7 @@ class _TutorPageState extends State<TutorPage> {
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(20.0))),
             title: const Text(
-              "Subject Details",
+              "Tutor Details",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             content: SingleChildScrollView(
